@@ -24,11 +24,12 @@
 #include <corecrt_math_defines.h>
 
 #define SOFTENING 1e-9f
-#define BLOCK_SIZE 256
+#define BLOCK_SIZE 128
 
 struct Particle {
     float x, y, z;
     float vx, vy, vz;
+    float mass;
 };
 // Declare global variables for mouse movement
 int lastMouseX = 0;
@@ -94,9 +95,12 @@ __global__ void nBodySimulation(Particle* currentParticles, Particle* lastPartic
             float invDist = sqrtf(distSqr);
             float invDist3 = invDist * invDist * invDist;
 
-            ax += dx * invDist3;
-            ay += dy * invDist3;
-            az += dz * invDist3;
+            float force = lastParticles[j].mass * invDist3;
+            //float force = 1 * invDist3;
+
+            ax += dx * force;
+            ay += dy * force;
+            az += dz * force;
         }
 
         // Update velocity
@@ -226,11 +230,11 @@ void HandleEvents(SDL_Event ev, bool& quit)
     case SDL_MOUSEWHEEL:
         if (ev.wheel.y > 0) // scroll up
         {
-            cameraDistance -= 0.2f;
+            cameraDistance -= 0.2f * cameraDistance;
         }
         else if (ev.wheel.y < 0) // scroll down
         {
-            cameraDistance += 0.2f;
+            cameraDistance += 0.2f * cameraDistance;
         }
         RotateCamera(0, 0);
         break;
@@ -295,7 +299,7 @@ void InitVaoVbo()
     glGenBuffers(1, &vboID);
     glBindBuffer(GL_ARRAY_BUFFER, vboID);
 
-    // VAO-ban jegyezzük fel, hogy a VBO-ban az elsõ 3 float sizeof(Vertex)-enként lesz az elsõ attribútum (pozíció)
+    // VAO-ban jegyezzük fel, hogy a VBO-ban az elsõ 3 float sizeof(Particle)-enként lesz az elsõ attribútum (pozíció)
     glEnableVertexAttribArray(0); // ez lesz majd a pozíció
     glVertexAttribPointer(
         (GLuint)0,				// a VB-ben található adatok közül a 0. "indexû" attribútumait állítjuk be
@@ -303,11 +307,11 @@ void InitVaoVbo()
         GL_FLOAT,		// adatok típusa
         GL_FALSE,		// normalizált legyen-e
         sizeof(Particle),	// stride (0=egymás után)
-        0				// a 0. indexû attribútum hol kezdõdik a sizeof(Vertex)-nyi területen belül
+        0				// a 0. indexû attribútum hol kezdõdik a sizeof(Particle)-nyi területen belül
     );
 
-    // a második attribútumhoz pedig a VBO-ban sizeof(Vertex) ugrás után sizeof(glm::vec3)-nyit menve újabb 3 float adatot találunk (szín)
-    glEnableVertexAttribArray(1); // ez lesz majd a szín
+    // a második attribútumhoz pedig a VBO-ban sizeof(Particle) ugrás után sizeof(glm::vec3)-nyit menve újabb 3 float adatot találunk (gyorsulás)
+    glEnableVertexAttribArray(1); // ez lesz majd a gyorsulás
     glVertexAttribPointer(
         (GLuint)1,
         3,
@@ -315,6 +319,15 @@ void InitVaoVbo()
         GL_FALSE,
         sizeof(Particle),
         (void*)(sizeof(glm::vec3)));
+    // a harmadik attribútumhoz pedig a VBO-ban sizeof(Particle) ugrás után 2 * sizeof(glm::vec3)-nyit menve újabb 1 float adatot találunk (tömeg)
+    glEnableVertexAttribArray(2); // ez lesz majd a tömeg
+    glVertexAttribPointer(
+        (GLuint)2,
+        1,
+        GL_FLOAT,
+        GL_FALSE,
+        sizeof(Particle),
+        (void*)(sizeof(glm::vec3) * 2));
 
     glBindVertexArray(0); // feltöltüttük a VAO-t, kapcsoljuk le
     glBindBuffer(GL_ARRAY_BUFFER, 0); // feltöltöttük a VBO-t is, ezt is vegyük le
@@ -335,7 +348,8 @@ void InitShaders()
 
     // attributomok osszerendelese a VAO es shader kozt
     glBindAttribLocation(shaderProgramID, 0, "vs_in_pos");
-    glBindAttribLocation(shaderProgramID, 1, "vs_in_col");
+    glBindAttribLocation(shaderProgramID, 1, "vs_in_acc");
+    glBindAttribLocation(shaderProgramID, 2, "vs_in_mass");
 
     // illesszük össze a shadereket (kimenõ-bemenõ változók összerendelése stb.)
     glLinkProgram(shaderProgramID);
@@ -361,7 +375,7 @@ void InitShaders()
     //glUseProgram(shaderProgramID);
 }
 
-int numParticles = BLOCK_SIZE * 40;
+int numParticles = BLOCK_SIZE * 80;
 int numIterations = 20000;
 float dt = 0.0003f;
 Particle* particlesHost = (Particle*)malloc(numParticles * sizeof(Particle));
@@ -382,6 +396,8 @@ void InitParticles()
         particlesHost[i].vx = -sin(angle) * speed;
         particlesHost[i].vy = cos(angle) * speed;
         particlesHost[i].vz = 0.0f;
+
+        particlesHost[i].mass = ((float)rand() / RAND_MAX);
     }
 }
 
@@ -391,6 +407,9 @@ void InitRendering()
 
     glEnable(GL_CULL_FACE);
     glEnable(GL_DEPTH_TEST);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glPointSize(2.0);
 
     InitVaoVbo();
     InitShaders();
@@ -415,7 +434,6 @@ void Render(glm::mat4 mvp)
     glBindVertexArray(vaoID);
 
     // uniformok
-    //glUniform3fv(glGetUniformLocation(shaderProgramID, "points"), BLOCK_SIZE, parti)
     glm::mat4 locMVP = mvp;
     glUniformMatrix4fv(glGetUniformLocation(shaderProgramID, "MVP"), 1, GL_FALSE, &locMVP[0][0]);
 
@@ -431,93 +449,12 @@ void Render(glm::mat4 mvp)
 void display(GLFWwindow* window, Particle* particles, int numParticles, glm::mat4 projection, glm::mat4 view) {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    /*
-    glMatrixMode(GL_PROJECTION);
-    glLoadMatrixf(glm::value_ptr(projection));
-
-    glMatrixMode(GL_MODELVIEW);
-    glLoadMatrixf(glm::value_ptr(view));
-    */
-    /*
-    glBegin(GL_POINTS);
-    for (int i = 0; i < numParticles; i++) {
-        Particle particle = particles[i];
-        glVertex3f(particle.x, particle.y, particle.z);
-    }
-    glEnd();
-    */
     Render(projection * view);
 
-    //glfwSwapBuffers(window);
     SDL_GL_SwapWindow(win);
 }
 
-
-
-void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods) {
-    if (button == GLFW_MOUSE_BUTTON_LEFT) {
-        if (action == GLFW_PRESS) {
-            //glfwGetCursorPos(window, &lastMouseX, &lastMouseY);
-            mousePressed = true;
-        }
-        else if (action == GLFW_RELEASE) {
-            mousePressed = false;
-        }
-    }
-}
-
-void cursorPosCallback(GLFWwindow* window, double xpos, double ypos) {
-    if (mousePressed) {
-        // Calculate mouse movement delta
-        double deltaX = xpos - lastMouseX;
-        double deltaY = ypos - lastMouseY;
-
-        // Update camera rotation based on mouse movement
-        float rotationSpeed = 0.01f;
-        view = glm::rotate(view, static_cast<float>(deltaX * rotationSpeed), glm::vec3(0.0f, 1.0f, 0.0f));
-        view = glm::rotate(view, static_cast<float>(deltaY * rotationSpeed), glm::vec3(1.0f, 0.0f, 0.0f));
-
-        lastMouseX = xpos;
-        lastMouseY = ypos;
-    }
-}
-
 int main(int argc, char* argv[]) {
-    //int numParticles = BLOCK_SIZE * 40;
-    //int numIterations = 20000;
-    //float dt = 0.0003f;
-
-    // Generate random particle positions
-    //Particle* particlesHost = (Particle*)malloc(numParticles * sizeof(Particle));
-    /**
-    for (int i = 0; i < numParticles; i++) {
-        particlesHost[i].x = static_cast <float> (rand()) / static_cast <float> (RAND_MAX) - 0.2;
-        particlesHost[i].y = static_cast <float> (rand()) / static_cast <float> (RAND_MAX) - 0.2;
-        particlesHost[i].z = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
-
-        particlesHost[i].vx = ((float)rand() / RAND_MAX) * 2.0f - 1.0f;
-        particlesHost[i].vy = ((float)rand() / RAND_MAX) * 2.0f - 1.0f;
-        particlesHost[i].vz = ((float)rand() / RAND_MAX) * 2.0f - 1.0f;
-    }
-    */
-    /*
-    for (int i = 0; i < numParticles; i++) {
-        // Generate random angle and distance from the center
-        float angle = ((float)rand() / RAND_MAX) * 2 * M_PI;
-        float distance = ((float)rand() / RAND_MAX) * 0.5f;
-
-        // Calculate initial positions around the center
-        particlesHost[i].x = 0.5f + cos(angle) * distance;
-        particlesHost[i].y = 0.5f + sin(angle) * distance;
-        particlesHost[i].z = 0.0f;
-
-        // Calculate initial velocities for rotation
-        float speed = distance * 100.0f;
-        particlesHost[i].vx = -sin(angle) * speed;
-        particlesHost[i].vy = cos(angle) * speed;
-        particlesHost[i].vz = 0.0f;
-    }
-    */
     bool quit = false;
 
     InitParticles();
@@ -531,40 +468,9 @@ int main(int argc, char* argv[]) {
     cudaMemcpy(particlesDev[1], particlesHost, particlesSize, cudaMemcpyHostToDevice);
 
     InitSDLWindow();
-    // Create GLFW window
-    /*
-    if (!glfwInit()) {
-        fprintf(stderr, "Failed to initialize GLFW.\n");
-        return -1;
-    }
-
-    glfwWindowHint(GLFW_DOUBLEBUFFER, GLFW_TRUE);
-    glfwSwapInterval(1);
-
-    GLFWwindow* window = glfwCreateWindow(800, 800, "N-Body Simulation", NULL, NULL);
-    if (!window) {
-        fprintf(stderr, "Failed to create GLFW window.\n");
-        glfwTerminate();
-        return -1;
-    }
-
-    glfwMakeContextCurrent(window);
-
-    glewExperimental = GL_TRUE;
-    glewInit();
-    */
-
-    glEnable(GL_DEPTH_TEST);
-    glPointSize(2.0);
 
     glm::mat4 projection = glm::perspective(glm::radians(45.0f), 1.0f, 0.1f, 100.0f);
     RotateCamera(0, 0);
-  
-    // Set mouse button callback
-    //glfwSetMouseButtonCallback(window, mouseButtonCallback);
-
-    // Set cursor position callback
-    //glfwSetCursorPosCallback(window, cursorPosCallback);
 
     InitRendering();
 
@@ -574,7 +480,6 @@ int main(int argc, char* argv[]) {
         {
             break;
         }
-
 
         // Swap particle buffers
         int currentBuffer = i % 2;
@@ -587,20 +492,12 @@ int main(int argc, char* argv[]) {
         cudaDeviceSynchronize();
 
         // Display particles
-        cudaMemcpy(particlesHost, particlesDev[nextBuffer], particlesSize, cudaMemcpyDeviceToHost);
+        cudaMemcpy(particlesHost, particlesDev[currentBuffer], particlesSize, cudaMemcpyDeviceToHost);
         //display(window, particlesHost, numParticles, projection, view);
         display(0, particlesHost, numParticles, projection, view);
 
-
-        // Swap GPU data as well
-        //std::swap(particlesDev[currentBuffer], particlesDev[nextBuffer]);
-
-        // Check for GLFW events
-        //glfwPollEvents();
-
         while (SDL_PollEvent(&event))
         {
-            // imgui input handling ezen belül
             HandleEvents(event, quit);
         }
     }
