@@ -13,12 +13,8 @@ C:\Users\Pavilion G. 1307147\Desktop\egyetem\4.fÚlÚv\gpu\N-Body\N-Body\include
   Remark: The warnings can be suppressed with "-diag-suppress <warning-number>"
   
   main.cu
-  tmpxft_00006208_00000000-7_main.cudafe1.cpp
+  tmpxft_000058d4_00000000-7_main.cudafe1.cpp
 C:\Users\Pavilion G. 1307147\Desktop\egyetem\4.félév\gpu\N-Body\N-Body\main.cu(54): warning C4305: '=': truncation from 'double' to 'float'
 C:\Users\Pavilion G. 1307147\Desktop\egyetem\4.félév\gpu\N-Body\N-Body\main.cu(58): warning C4305: '=': truncation from 'double' to 'float'
 C:\Users\Pavilion G. 1307147\Desktop\egyetem\4.félév\gpu\N-Body\N-Body\main.cu(386): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-     Creating library C:\Users\Pavilion G. 1307147\Desktop\egyetem\4.félév\gpu\N-Body\x64\Debug\N-Body.lib and object C:\Users\Pavilion G. 1307147\Desktop\egyetem\4.félév\gpu\N-Body\x64\Debug\N-Body.exp
-LINK : warning LNK4098: defaultlib 'LIBCMT' conflicts with use of other libs; use /NODEFAULTLIB:library
-LINK : warning LNK4098: defaultlib 'MSVCRT' conflicts with use of other libs; use /NODEFAULTLIB:library
-glew32s.lib(glew.obj) : warning LNK4099: PDB 'vc120.pdb' was not found with 'glew32s.lib(glew.obj)' or at 'C:\Users\Pavilion G. 1307147\Desktop\egyetem\4.félév\gpu\N-Body\x64\Debug\vc120.pdb'; linking object as if no debug info
   N-Body.vcxproj -> C:\Users\Pavilion G. 1307147\Desktop\egyetem\4.félév\gpu\N-Body\x64\Debug\N-Body.exe

@@ -188,15 +188,6 @@ void InitSDLWindow()
     // engedélyezzük és állítsuk be a debug callback függvényt ha debug context-ben vagyunk 
     GLint context_flags;
     glGetIntegerv(GL_CONTEXT_FLAGS, &context_flags);
-    
-    /*
-    if (context_flags & GL_CONTEXT_FLAG_DEBUG_BIT) {
-        glEnable(GL_DEBUG_OUTPUT);
-        glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
-        glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DEBUG_SEVERITY_NOTIFICATION, 0, nullptr, GL_FALSE);
-        glDebugMessageCallback(GLDebugMessageCallback, nullptr);
-    }
-    */
 }
 
 void HandleEvents(SDL_Event ev, bool& quit)
@@ -375,7 +366,7 @@ void InitShaders()
     //glUseProgram(shaderProgramID);
 }
 
-int numParticles = BLOCK_SIZE * 80;
+int numParticles = BLOCK_SIZE * 40;
 int numIterations = 20000;
 float dt = 0.0003f;
 Particle* particlesHost = (Particle*)malloc(numParticles * sizeof(Particle));
@@ -492,7 +483,7 @@ int main(int argc, char* argv[]) {
         cudaDeviceSynchronize();
 
         // Display particles
-        cudaMemcpy(particlesHost, particlesDev[currentBuffer], particlesSize, cudaMemcpyDeviceToHost);
+        cudaMemcpy(particlesHost, particlesDev[nextBuffer], particlesSize, cudaMemcpyDeviceToHost);
         //display(window, particlesHost, numParticles, projection, view);
         display(0, particlesHost, numParticles, projection, view);
 
