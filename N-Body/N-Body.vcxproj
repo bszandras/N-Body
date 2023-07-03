@@ -11,7 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <CudaCompile Include="main.cu" />
+    <CudaCompile Include="interop.cu" />
   </ItemGroup>
   <ItemGroup>
     <None Include="frag.frag" />
