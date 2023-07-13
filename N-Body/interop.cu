@@ -34,11 +34,11 @@ struct Particle {
     float vx, vy, vz;
     float mass;
 };
-// Declare global variables for mouse movement
+
 int lastMouseX = 0;
 int lastMouseY = 0;
 bool mousePressed = false;
-glm::mat4 view; // View matrix
+glm::mat4 view;
 float mouseAngleX = 0.0f;
 float mouseAngleY = 0.8f;
 float rotationSpeed = 0.01f;
@@ -87,6 +87,7 @@ void RotateCamera(int dx, int dy)
     view = glm::lookAt(eye, at, up);
 }
 
+// szimuláció ami CUDA
 __global__ void nBodySimulation(Particle* currentParticles, Particle* lastParticles, float dt, int numParticles, float gravity) {
     // Get the global thread ID
     int tid = blockIdx.x * blockDim.x + threadIdx.x;
@@ -128,6 +129,7 @@ __global__ void nBodySimulation(Particle* currentParticles, Particle* lastPartic
     }
 }
 
+// sdl inicializáció
 SDL_Window* win;
 SDL_GLContext context;
 SDL_Event event;
@@ -203,6 +205,7 @@ void InitSDLWindow()
     glGetIntegerv(GL_CONTEXT_FLAGS, &context_flags);
 }
 
+// ablak input eventek
 void HandleEvents(SDL_Event ev, bool& quit)
 {
     switch (ev.type)
@@ -263,28 +266,15 @@ void HandleEvents(SDL_Event ev, bool& quit)
     }
 
     case SDL_WINDOWEVENT:
-        // Néhány platformon (pl. Windows) a SIZE_CHANGED nem hívódik meg az elsõ megjelenéskor.
-        // Szerintünk ez bug az SDL könytárban.
-        // Ezért ezt az esetet külön lekezeljük, 
-        // mivel a MyApp esetlegesen tartalmazhat ablak méret függõ beállításokat, pl. a kamera aspect ratioját a perspective() hívásnál.
         if (ev.window.event == SDL_WINDOWEVENT_SHOWN)
         {
             int w, h;
             SDL_GetWindowSize(win, &w, &h);
 
-            //width = w;
-            //height = h;
-
-            //app->Resize(w, h);
         }
         if (ev.window.event == SDL_WINDOWEVENT_SIZE_CHANGED)
         {
-            /*
-            width = ev.window.data1;
-            height = ev.window.data2;
-            std::cout << width << " " << height << std::endl;
-            app->Resize(ev.window.data1, ev.window.data2);
-            */
+
         }
         break;
     }
@@ -389,9 +379,6 @@ void InitShaders()
     // már nincs ezekre szükség
     glDeleteShader(vs_ID);
     glDeleteShader(fs_ID);
-
-    //uniformok
-    //glUseProgram(shaderProgramID);
 }
 
 void InitParticles()
@@ -537,23 +524,6 @@ int main(int argc, char* argv[]) {
     //Imgui init
     ImGui_ImplSdlGL3_Init(win);
 
-    // map cuda
-    // get pointer
-    // copy data
-    // unmap cuda
-    /*
-    
-    cudaGraphicsMapResources(1, &cudaVboResource[0]);
-    cudaGraphicsResourceGetMappedPointer((void**)&particlesDev[0], &size, cudaVboResource[0]);
-    cudaMemcpy(particlesDev[0], particlesHost, particlesSize, cudaMemcpyHostToDevice);
-    cudaGraphicsUnmapResources(1, &cudaVboResource[0]);
-
-    cudaGraphicsMapResources(1, &cudaVboResource[1]);
-    cudaGraphicsResourceGetMappedPointer((void**)&particlesDev[1], &size, cudaVboResource[1]);
-    cudaMemcpy(particlesDev[1], particlesHost, particlesSize, cudaMemcpyHostToDevice);
-    cudaGraphicsUnmapResources(1, &cudaVboResource[1]);
-    */
-
     // Start the simulation loop
     for (int i = 0; i < numIterations; i++) {
         while (SDL_PollEvent(&event))
@@ -590,7 +560,7 @@ int main(int argc, char* argv[]) {
 
         
         ShowMenuUI();
-        //ImGui::ShowTestWindow();
+
         ImGui::Render();
         SDL_GL_SwapWindow(win);
 
