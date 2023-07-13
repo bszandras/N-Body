@@ -17,6 +17,12 @@
     <None Include="frag.frag" />
     <None Include="vert.vert" />
   </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="include\imgui\imgui.cpp" />
+    <ClCompile Include="include\imgui\imgui_demo.cpp" />
+    <ClCompile Include="include\imgui\imgui_draw.cpp" />
+    <ClCompile Include="include\imgui\imgui_impl_sdl_gl3.cpp" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{D9675BA6-0DDB-46F1-AF66-49F54C2EB5A4}</ProjectGuid>
     <RootNamespace>N_Body</RootNamespace>

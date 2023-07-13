@@ -8,14 +8,46 @@ C:\Users\Pavilion G. 1307147\Desktop\egyetem\4.fÚlÚv\gpu\N-Body\N-Body\include
     		                         ^
             detected during:
               instantiation of "glm::tmat4x4<T, glm::packed_highp> glm::perspectiveRH(T, T, T, T) [with T=float]" at line 253
-              instantiation of "glm::tmat4x4<T, glm::packed_highp> glm::perspective(T, T, T, T) [with T=float]" at line 455 of C:\Users\Pavilion G. 1307147\Desktop\egyetem\4.fÚlÚv\gpu\N-Body\N-Body\interop.cu
+              instantiation of "glm::tmat4x4<T, glm::packed_highp> glm::perspective(T, T, T, T) [with T=float]" at line 533 of C:\Users\Pavilion G. 1307147\Desktop\egyetem\4.fÚlÚv\gpu\N-Body\N-Body\interop.cu
   
   Remark: The warnings can be suppressed with "-diag-suppress <warning-number>"
   
   interop.cu
-  tmpxft_00004824_00000000-7_interop.cudafe1.cpp
-C:\Users\Pavilion G. 1307147\Desktop\egyetem\4.félév\gpu\N-Body\N-Body\interop.cu(59): warning C4305: '=': truncation from 'double' to 'float'
-C:\Users\Pavilion G. 1307147\Desktop\egyetem\4.félév\gpu\N-Body\N-Body\interop.cu(63): warning C4305: '=': truncation from 'double' to 'float'
-C:\Users\Pavilion G. 1307147\Desktop\egyetem\4.félév\gpu\N-Body\N-Body\interop.cu(294): warning C4996: 'cudaGLSetGLDevice': was declared deprecated
-C:\Users\Pavilion G. 1307147\Desktop\egyetem\4.félév\gpu\N-Body\N-Body\interop.cu(389): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+  tmpxft_00002084_00000000-7_interop.cudafe1.cpp
+C:\Users\Pavilion G. 1307147\Desktop\egyetem\4.félév\gpu\N-Body\N-Body\interop.cu(56): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
+C:\Users\Pavilion G. 1307147\Desktop\egyetem\4.félév\gpu\N-Body\N-Body\interop.cu(67): warning C4305: '=': truncation from 'double' to 'float'
+C:\Users\Pavilion G. 1307147\Desktop\egyetem\4.félév\gpu\N-Body\N-Body\interop.cu(71): warning C4305: '=': truncation from 'double' to 'float'
+C:\Users\Pavilion G. 1307147\Desktop\egyetem\4.félév\gpu\N-Body\N-Body\interop.cu(306): warning C4996: 'cudaGLSetGLDevice': was declared deprecated
+C:\Users\Pavilion G. 1307147\Desktop\egyetem\4.félév\gpu\N-Body\N-Body\interop.cu(401): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+     Creating library C:\Users\Pavilion G. 1307147\Desktop\egyetem\4.félév\gpu\N-Body\x64\Debug\N-Body.lib and object C:\Users\Pavilion G. 1307147\Desktop\egyetem\4.félév\gpu\N-Body\x64\Debug\N-Body.exp
+LINK : warning LNK4098: defaultlib 'LIBCMT' conflicts with use of other libs; use /NODEFAULTLIB:library
+LINK : warning LNK4217: symbol '__glewActiveTexture' defined in 'glew32s.lib(glew.obj)' is imported by 'imgui_impl_sdl_gl3.obj' in function '"void __cdecl ImGui_ImplSdlGL3_RenderDrawLists(struct ImDrawData *)" (?ImGui_ImplSdlGL3_RenderDrawLists@@YAXPEAUImDrawData@@@Z)'
+LINK : warning LNK4217: symbol '__glewBlendEquation' defined in 'glew32s.lib(glew.obj)' is imported by 'imgui_impl_sdl_gl3.obj' in function '"void __cdecl ImGui_ImplSdlGL3_RenderDrawLists(struct ImDrawData *)" (?ImGui_ImplSdlGL3_RenderDrawLists@@YAXPEAUImDrawData@@@Z)'
+LINK : warning LNK4217: symbol '__glewBlendFuncSeparate' defined in 'glew32s.lib(glew.obj)' is imported by 'imgui_impl_sdl_gl3.obj' in function '"void __cdecl ImGui_ImplSdlGL3_RenderDrawLists(struct ImDrawData *)" (?ImGui_ImplSdlGL3_RenderDrawLists@@YAXPEAUImDrawData@@@Z)'
+LINK : warning LNK4217: symbol '__glewBindBuffer' defined in 'glew32s.lib(glew.obj)' is imported by 'imgui_impl_sdl_gl3.obj' in function '"bool __cdecl ImGui_ImplSdlGL3_CreateDeviceObjects(void)" (?ImGui_ImplSdlGL3_CreateDeviceObjects@@YA_NXZ)'
+LINK : warning LNK4217: symbol '__glewBufferData' defined in 'glew32s.lib(glew.obj)' is imported by 'imgui_impl_sdl_gl3.obj' in function '"void __cdecl ImGui_ImplSdlGL3_RenderDrawLists(struct ImDrawData *)" (?ImGui_ImplSdlGL3_RenderDrawLists@@YAXPEAUImDrawData@@@Z)'
+LINK : warning LNK4217: symbol '__glewDeleteBuffers' defined in 'glew32s.lib(glew.obj)' is imported by 'imgui_impl_sdl_gl3.obj' in function '"void __cdecl ImGui_ImplSdlGL3_InvalidateDeviceObjects(void)" (?ImGui_ImplSdlGL3_InvalidateDeviceObjects@@YAXXZ)'
+LINK : warning LNK4217: symbol '__glewGenBuffers' defined in 'glew32s.lib(glew.obj)' is imported by 'imgui_impl_sdl_gl3.obj' in function '"bool __cdecl ImGui_ImplSdlGL3_CreateDeviceObjects(void)" (?ImGui_ImplSdlGL3_CreateDeviceObjects@@YA_NXZ)'
+LINK : warning LNK4217: symbol '__glewAttachShader' defined in 'glew32s.lib(glew.obj)' is imported by 'imgui_impl_sdl_gl3.obj' in function '"bool __cdecl ImGui_ImplSdlGL3_CreateDeviceObjects(void)" (?ImGui_ImplSdlGL3_CreateDeviceObjects@@YA_NXZ)'
+LINK : warning LNK4217: symbol '__glewBlendEquationSeparate' defined in 'glew32s.lib(glew.obj)' is imported by 'imgui_impl_sdl_gl3.obj' in function '"void __cdecl ImGui_ImplSdlGL3_RenderDrawLists(struct ImDrawData *)" (?ImGui_ImplSdlGL3_RenderDrawLists@@YAXPEAUImDrawData@@@Z)'
+LINK : warning LNK4217: symbol '__glewCompileShader' defined in 'glew32s.lib(glew.obj)' is imported by 'imgui_impl_sdl_gl3.obj' in function '"bool __cdecl ImGui_ImplSdlGL3_CreateDeviceObjects(void)" (?ImGui_ImplSdlGL3_CreateDeviceObjects@@YA_NXZ)'
+LINK : warning LNK4217: symbol '__glewCreateProgram' defined in 'glew32s.lib(glew.obj)' is imported by 'imgui_impl_sdl_gl3.obj' in function '"bool __cdecl ImGui_ImplSdlGL3_CreateDeviceObjects(void)" (?ImGui_ImplSdlGL3_CreateDeviceObjects@@YA_NXZ)'
+LINK : warning LNK4217: symbol '__glewCreateShader' defined in 'glew32s.lib(glew.obj)' is imported by 'imgui_impl_sdl_gl3.obj' in function '"bool __cdecl ImGui_ImplSdlGL3_CreateDeviceObjects(void)" (?ImGui_ImplSdlGL3_CreateDeviceObjects@@YA_NXZ)'
+LINK : warning LNK4217: symbol '__glewDeleteProgram' defined in 'glew32s.lib(glew.obj)' is imported by 'imgui_impl_sdl_gl3.obj' in function '"void __cdecl ImGui_ImplSdlGL3_InvalidateDeviceObjects(void)" (?ImGui_ImplSdlGL3_InvalidateDeviceObjects@@YAXXZ)'
+LINK : warning LNK4217: symbol '__glewDeleteShader' defined in 'glew32s.lib(glew.obj)' is imported by 'imgui_impl_sdl_gl3.obj' in function '"void __cdecl ImGui_ImplSdlGL3_InvalidateDeviceObjects(void)" (?ImGui_ImplSdlGL3_InvalidateDeviceObjects@@YAXXZ)'
+LINK : warning LNK4217: symbol '__glewDetachShader' defined in 'glew32s.lib(glew.obj)' is imported by 'imgui_impl_sdl_gl3.obj' in function '"void __cdecl ImGui_ImplSdlGL3_InvalidateDeviceObjects(void)" (?ImGui_ImplSdlGL3_InvalidateDeviceObjects@@YAXXZ)'
+LINK : warning LNK4217: symbol '__glewEnableVertexAttribArray' defined in 'glew32s.lib(glew.obj)' is imported by 'imgui_impl_sdl_gl3.obj' in function '"bool __cdecl ImGui_ImplSdlGL3_CreateDeviceObjects(void)" (?ImGui_ImplSdlGL3_CreateDeviceObjects@@YA_NXZ)'
+LINK : warning LNK4217: symbol '__glewGetAttribLocation' defined in 'glew32s.lib(glew.obj)' is imported by 'imgui_impl_sdl_gl3.obj' in function '"bool __cdecl ImGui_ImplSdlGL3_CreateDeviceObjects(void)" (?ImGui_ImplSdlGL3_CreateDeviceObjects@@YA_NXZ)'
+LINK : warning LNK4217: symbol '__glewGetUniformLocation' defined in 'glew32s.lib(glew.obj)' is imported by 'imgui_impl_sdl_gl3.obj' in function '"bool __cdecl ImGui_ImplSdlGL3_CreateDeviceObjects(void)" (?ImGui_ImplSdlGL3_CreateDeviceObjects@@YA_NXZ)'
+LINK : warning LNK4217: symbol '__glewLinkProgram' defined in 'glew32s.lib(glew.obj)' is imported by 'imgui_impl_sdl_gl3.obj' in function '"bool __cdecl ImGui_ImplSdlGL3_CreateDeviceObjects(void)" (?ImGui_ImplSdlGL3_CreateDeviceObjects@@YA_NXZ)'
+LINK : warning LNK4217: symbol '__glewShaderSource' defined in 'glew32s.lib(glew.obj)' is imported by 'imgui_impl_sdl_gl3.obj' in function '"bool __cdecl ImGui_ImplSdlGL3_CreateDeviceObjects(void)" (?ImGui_ImplSdlGL3_CreateDeviceObjects@@YA_NXZ)'
+LINK : warning LNK4217: symbol '__glewUniform1i' defined in 'glew32s.lib(glew.obj)' is imported by 'imgui_impl_sdl_gl3.obj' in function '"void __cdecl ImGui_ImplSdlGL3_RenderDrawLists(struct ImDrawData *)" (?ImGui_ImplSdlGL3_RenderDrawLists@@YAXPEAUImDrawData@@@Z)'
+LINK : warning LNK4217: symbol '__glewUniformMatrix4fv' defined in 'glew32s.lib(glew.obj)' is imported by 'imgui_impl_sdl_gl3.obj' in function '"void __cdecl ImGui_ImplSdlGL3_RenderDrawLists(struct ImDrawData *)" (?ImGui_ImplSdlGL3_RenderDrawLists@@YAXPEAUImDrawData@@@Z)'
+LINK : warning LNK4217: symbol '__glewUseProgram' defined in 'glew32s.lib(glew.obj)' is imported by 'imgui_impl_sdl_gl3.obj' in function '"void __cdecl ImGui_ImplSdlGL3_RenderDrawLists(struct ImDrawData *)" (?ImGui_ImplSdlGL3_RenderDrawLists@@YAXPEAUImDrawData@@@Z)'
+LINK : warning LNK4217: symbol '__glewVertexAttribPointer' defined in 'glew32s.lib(glew.obj)' is imported by 'imgui_impl_sdl_gl3.obj' in function '"bool __cdecl ImGui_ImplSdlGL3_CreateDeviceObjects(void)" (?ImGui_ImplSdlGL3_CreateDeviceObjects@@YA_NXZ)'
+LINK : warning LNK4217: symbol '__glewBindSampler' defined in 'glew32s.lib(glew.obj)' is imported by 'imgui_impl_sdl_gl3.obj' in function '"void __cdecl ImGui_ImplSdlGL3_RenderDrawLists(struct ImDrawData *)" (?ImGui_ImplSdlGL3_RenderDrawLists@@YAXPEAUImDrawData@@@Z)'
+LINK : warning LNK4217: symbol '__glewBindVertexArray' defined in 'glew32s.lib(glew.obj)' is imported by 'imgui_impl_sdl_gl3.obj' in function '"bool __cdecl ImGui_ImplSdlGL3_CreateDeviceObjects(void)" (?ImGui_ImplSdlGL3_CreateDeviceObjects@@YA_NXZ)'
+LINK : warning LNK4217: symbol '__glewDeleteVertexArrays' defined in 'glew32s.lib(glew.obj)' is imported by 'imgui_impl_sdl_gl3.obj' in function '"void __cdecl ImGui_ImplSdlGL3_InvalidateDeviceObjects(void)" (?ImGui_ImplSdlGL3_InvalidateDeviceObjects@@YAXXZ)'
+LINK : warning LNK4217: symbol '__glewGenVertexArrays' defined in 'glew32s.lib(glew.obj)' is imported by 'imgui_impl_sdl_gl3.obj' in function '"bool __cdecl ImGui_ImplSdlGL3_CreateDeviceObjects(void)" (?ImGui_ImplSdlGL3_CreateDeviceObjects@@YA_NXZ)'
+glew32s.lib(glew.obj) : warning LNK4099: PDB 'vc120.pdb' was not found with 'glew32s.lib(glew.obj)' or at 'C:\Users\Pavilion G. 1307147\Desktop\egyetem\4.félév\gpu\N-Body\x64\Debug\vc120.pdb'; linking object as if no debug info
   N-Body.vcxproj -> C:\Users\Pavilion G. 1307147\Desktop\egyetem\4.félév\gpu\N-Body\x64\Debug\N-Body.exe

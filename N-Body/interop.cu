@@ -12,6 +12,9 @@
 #include <SDL.h>
 #include <SDL_opengl.h>
 
+#include <imgui/imgui.h>
+#include <imgui/imgui_impl_sdl_gl3.h>
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -45,10 +48,15 @@ glm::vec3 camUp;
 glm::vec3 camForward;
 glm::vec3 camRight;
 
+bool uniform = false;
+bool initialVel = true;
+float gravSetting = 1;
+float grav = 1;
 int numParticles = BLOCK_SIZE * 80;
+float startingParticleNum = numParticles;
 int numIterations = 20000;
 float dt = 0.0003f;
-Particle* particlesHost = (Particle*)malloc(numParticles * sizeof(Particle));
+Particle* particlesHost;
 
 void RotateCamera(int dx, int dy)
 {
@@ -79,7 +87,7 @@ void RotateCamera(int dx, int dy)
     view = glm::lookAt(eye, at, up);
 }
 
-__global__ void nBodySimulation(Particle* currentParticles, Particle* lastParticles, float dt, int numParticles) {
+__global__ void nBodySimulation(Particle* currentParticles, Particle* lastParticles, float dt, int numParticles, float gravity) {
     // Get the global thread ID
     int tid = blockIdx.x * blockDim.x + threadIdx.x;
 
@@ -100,7 +108,7 @@ __global__ void nBodySimulation(Particle* currentParticles, Particle* lastPartic
             float invDist = sqrtf(distSqr);
             float invDist3 = invDist * invDist * invDist;
 
-            float force = lastParticles[j].mass * invDist3;
+            float force = lastParticles[j].mass * gravity * invDist3;
             //float force = 1 * invDist3;
 
             ax += dx * force;
@@ -289,6 +297,10 @@ GLuint vboPingPong[2];
 GLuint vaoPingPong[2];
 
 cudaGraphicsResource* cudaVboResource[2];
+
+Particle* particlesDev[2];
+size_t particlesSize = numParticles * sizeof(Particle);
+size_t size;
 void InitVaoVbo()
 {
     cudaGLSetGLDevice(0);
@@ -395,10 +407,20 @@ void InitParticles()
         particlesHost[i].z = (-0.5f + ((float)rand() / RAND_MAX)) * 0.1f;
 
         // Calculate initial velocities for rotation
-        float speed = distance * distance * 100.0f;
-        particlesHost[i].vx = -sin(angle) * speed;
-        particlesHost[i].vy = cos(angle) * speed;
-        particlesHost[i].vz = 0.0f;
+        if (initialVel)
+        {
+            float speed = distance * distance * 100.0f;
+            particlesHost[i].vx = -sin(angle) * speed;
+            particlesHost[i].vy = cos(angle) * speed;
+            particlesHost[i].vz = 0.0f;
+        }
+        else
+        {
+            particlesHost[i].vx = 0.0f;
+            particlesHost[i].vy = 0.0f;
+            particlesHost[i].vz = 0.0f;
+        }
+        
 
         particlesHost[i].mass = ((float)rand() / RAND_MAX);
     }
@@ -414,7 +436,7 @@ void InitRendering()
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glPointSize(2.0);
 
-    InitVaoVbo();
+    //InitVaoVbo();
     InitShaders();
 }
 
@@ -440,28 +462,30 @@ void RenderParticles(SDL_Window* window, glm::mat4 mvp, int bufferID)
     // shader kikapcsolása
     glUseProgram(0);
 
-    SDL_GL_SwapWindow(win);
+    //SDL_GL_SwapWindow(win);
 }
+void Restart()
+{
+    cudaGraphicsUnregisterResource(cudaVboResource[0]);
+    cudaGraphicsUnregisterResource(cudaVboResource[1]);
+    glDeleteBuffers(1, &vboPingPong[0]);
+    glDeleteBuffers(1, &vboPingPong[1]);
 
-int main(int argc, char* argv[]) {
-    bool quit = false;
+    free(particlesHost);
 
+    grav = gravSetting;
+    numParticles = (int)startingParticleNum;
+    particlesHost = (Particle*)malloc(numParticles * sizeof(Particle));
     InitParticles();
-    Particle* particlesDev[2];
-    size_t particlesSize = numParticles * sizeof(Particle);
 
-    InitSDLWindow();
-
-    glm::mat4 projection = glm::perspective(glm::radians(45.0f), 1.0f, 0.1f, 100.0f);
-    RotateCamera(0, 0);
-
-    InitRendering();
+    InitVaoVbo();
+    particlesSize = numParticles * sizeof(Particle);
 
     // map cuda
     // get pointer
     // copy data
     // unmap cuda
-    size_t size;
+    //size_t size;
     cudaGraphicsMapResources(1, &cudaVboResource[0]);
     cudaGraphicsResourceGetMappedPointer((void**)&particlesDev[0], &size, cudaVboResource[0]);
     cudaMemcpy(particlesDev[0], particlesHost, particlesSize, cudaMemcpyHostToDevice);
@@ -472,12 +496,77 @@ int main(int argc, char* argv[]) {
     cudaMemcpy(particlesDev[1], particlesHost, particlesSize, cudaMemcpyHostToDevice);
     cudaGraphicsUnmapResources(1, &cudaVboResource[1]);
 
+}
+void ShowMenuUI()
+{
+    if (ImGui::Begin("Gyak11"))
+    {
+        ImGui::Text("Gravitational constant");
+        ImGui::InputFloat(" ", &gravSetting, 0.1f, 0.1f, 1);
+
+        ImGui::Text("Particle number");
+        ImGui::InputFloat("  ", &startingParticleNum, 100.0f, 100.0f, 0);
+
+        if (ImGui::Checkbox("Uniform distribution", &uniform))
+        {
+
+        }
+
+        if (ImGui::Checkbox("Initial velocity", &initialVel))
+        {
+
+        }
+
+        if (ImGui::Button("Restart"))
+        {
+            Restart();
+        }
+    }
+    ImGui::End();
+}
+int main(int argc, char* argv[]) {
+    bool quit = false;
+    //InitParticles();
+
+    InitSDLWindow();
+    Restart();
+    glm::mat4 projection = glm::perspective(glm::radians(45.0f), 1.0f, 0.1f, 100.0f);
+    RotateCamera(0, 0);
+
+    InitRendering();
+    //Imgui init
+    ImGui_ImplSdlGL3_Init(win);
+
+    // map cuda
+    // get pointer
+    // copy data
+    // unmap cuda
+    /*
+    
+    cudaGraphicsMapResources(1, &cudaVboResource[0]);
+    cudaGraphicsResourceGetMappedPointer((void**)&particlesDev[0], &size, cudaVboResource[0]);
+    cudaMemcpy(particlesDev[0], particlesHost, particlesSize, cudaMemcpyHostToDevice);
+    cudaGraphicsUnmapResources(1, &cudaVboResource[0]);
+
+    cudaGraphicsMapResources(1, &cudaVboResource[1]);
+    cudaGraphicsResourceGetMappedPointer((void**)&particlesDev[1], &size, cudaVboResource[1]);
+    cudaMemcpy(particlesDev[1], particlesHost, particlesSize, cudaMemcpyHostToDevice);
+    cudaGraphicsUnmapResources(1, &cudaVboResource[1]);
+    */
+
     // Start the simulation loop
     for (int i = 0; i < numIterations; i++) {
+        while (SDL_PollEvent(&event))
+        {
+            ImGui_ImplSdlGL3_ProcessEvent(&event);
+            HandleEvents(event, quit);
+        }
         if (quit)
         {
             break;
         }
+
+        ImGui_ImplSdlGL3_NewFrame(win);
 
         // Swap particle buffers
         int currentBuffer = i % 2;
@@ -490,7 +579,7 @@ int main(int argc, char* argv[]) {
         cudaGraphicsResourceGetMappedPointer((void**)&particlesDev[1], &size, cudaVboResource[1]);
         
         // Launch the kernel
-        nBodySimulation <<< (numParticles + BLOCK_SIZE - 1) / BLOCK_SIZE, BLOCK_SIZE >>> (particlesDev[currentBuffer], particlesDev[nextBuffer], dt, numParticles);
+        nBodySimulation <<< (numParticles + BLOCK_SIZE - 1) / BLOCK_SIZE, BLOCK_SIZE >>> (particlesDev[currentBuffer], particlesDev[nextBuffer], dt, numParticles, grav);
 
         // Wait for kernel to finish
         cudaDeviceSynchronize();
@@ -499,16 +588,21 @@ int main(int argc, char* argv[]) {
 
         RenderParticles(win, projection * view, currentBuffer);
 
-        while (SDL_PollEvent(&event))
-        {
-            HandleEvents(event, quit);
-        }
+        
+        ShowMenuUI();
+        //ImGui::ShowTestWindow();
+        ImGui::Render();
+        SDL_GL_SwapWindow(win);
+
     }
 
     // Cleanup
-    glfwTerminate();
-    cudaFree(particlesDev[0]);
-    cudaFree(particlesDev[1]);
+    ImGui_ImplSdlGL3_Shutdown();
+    cudaGraphicsUnregisterResource(cudaVboResource[0]);
+    cudaGraphicsUnregisterResource(cudaVboResource[1]);
+    glDeleteBuffers(1, &vboPingPong[0]);
+    glDeleteBuffers(1, &vboPingPong[1]);
+
     free(particlesHost);
 
     SDL_GL_DeleteContext(context);
